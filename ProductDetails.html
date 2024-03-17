@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: white;
+        margin: 0;
+        padding: 20px;
+    }
+    .heading {
+        text-align: center;
+        font-size: 240%;
+        color: black;
+        text-decoration-line: underline;
+    }
+    .subheadings{
+        text-align: center;
+        font-size: 140%;
+    } 
+    table,th,td {
+        padding: 5px;
+        text-align: center;
+        border-bottom: 1px solid black;
+        border-collapse: collapse;
+    }
+    table{
+        border: 2px solid black;
+        margin-left:auto;
+        margin-right:auto;
+    }
+    tr{
+        background-color: #f2f2f2;
+    }
+    tr:hover{
+        background-color: white;
+    }
+    #cleardiv {
+        clear: left;
+    }
+    .inputElem {
+        padding: 100%;
+        width: 15%;
+        font-weight: 400;
+        padding: 3px;
+        border: 3px solid;
+        border-color: silver;
+    }
+    .addButton{
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    .addButton:hover {
+        background-color: #0056b3;
+    }
+
+    .addButton:active {
+        background-color: #0056b3;
+    }
+    .edbuttons{
+        cursor: pointer;
+        color: white;
+        background-color: black;
+        border-color: gray;
+        border-radius: 2%;
+    }
+    .addfields{
+        padding-top: 20px; 
+    }
+</style>
+
+<html>
+    <body>
+        <h2>HELLO ADMIN!</h2>
+        <div class="heading">
+            <p>Product Details</p>
+        </div>
+        <div style="text-align: center;">
+            <button type="button" class="addButton" onclick="document.getElementById('menuEdit').scrollIntoView();"><b>Click to add</b></button>
+        </div>
+        <br>
+        <div>
+            <table style="width:80%" id="productTable">   
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Price(Rs.)</th> 
+                        <th>Quantity Available</th>
+                        <th>Action</th>
+                    </tr>
+                </table>
+            <br><br>
+        </div>
+        <br>
+        <div id="menuEdit">
+            <p style="font-size: 130%"><b>ADD NEW PRODUCT :</b></p>
+            <div align="left" style="padding-left: 2%;">
+                <form action="" id="my_form">
+                    <div class="addfields" style="width: 25%"><b>
+                    Product ID<sup style="color:red">*</sup>:</b> <input type="number" class="inputElem" id="pid" required>
+                    </div>
+                    <div class="addfields" style="width: 230%"><b>
+                    Product Name<sup style="color:red">*</sup>:</b> <input type="text" class="inputElem" id="pname" required>
+                    </div>  
+                    <div class="addfields" style="width: 40%"><b>
+                    Price(Rs.)<sup style="color:red">*</sup>:</b> <input type="number" class="inputElem" id="pprice" required>
+                    </div> 
+                    <div class="addfields" style="width: 19%"><b>
+                    Quantity<sup style="color:red">*</sup>:</b> <input type="number" class="inputElem" id="pquantity" min="1" max="99" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="addButton" onclick="addProduct()"> Add</button>
+                </form>
+            </div>  
+        </div> 
+    </body>
+</html>
+
+<script> 
+    let productID = JSON.parse(localStorage.getItem('productID')) || [];
+    let productNames = JSON.parse(localStorage.getItem('productNames')) || [];
+    let price = JSON.parse(localStorage.getItem('price')) || [];
+    let quantity = JSON.parse(localStorage.getItem('quantity')) || [];
+
+    let productTable = document.getElementById("productTable");
+
+    productID.map(function(elem, index) {
+        console.log(elem);
+        let newRow = productTable.insertRow(productTable.rows.length); 
+        newRow.insertCell(0).innerHTML = elem; 
+        newRow.insertCell(1).innerHTML = productNames[index]; 
+        newRow.insertCell(2).innerHTML = price[index]; 
+        newRow.insertCell(3).innerHTML = quantity[index]; 
+        newRow.insertCell(4).innerHTML = '<button class="edbuttons" data-name="'+elem+'" onclick="editData(this)">Edit</button>'+" "+ 
+                                        '<button class="edbuttons" data-name="'+elem+'" onclick="deleteData(this)">Delete</button>';
+    })
+
+    function addProduct() { 
+        let pid = document.getElementById("pid").value; 
+        let pname = document.getElementById("pname").value; 
+        let pprice = document.getElementById("pprice").value; 
+        let pquan = document.getElementById("pquantity").value; 
+
+        const form = document.getElementById('my_form');
+
+        if(productID.includes(Number(pid))) {
+            alert("Product ID already exists.");
+            form.reset();
+            return false;
+        }
+
+        if(pid!='' && pname!='' && pprice!='' && pquan!=''){
+            let table;
+            table = document.getElementById("productTable");
+            productID.push(Number(pid));
+            productNames.push(pname);
+            price.push(Number(pprice));
+            quantity.push(Number(pquan));
+            localStorage.setItem("productID", JSON.stringify(productID));
+            localStorage.setItem("productNames", JSON.stringify(productNames));
+            localStorage.setItem("price", JSON.stringify(price));
+            localStorage.setItem("quantity", JSON.stringify(quantity));
+            let newRow = table.insertRow(-1); 
+            newRow.insertCell(0).innerHTML = pid;
+            newRow.insertCell(1).innerHTML = pname;
+            newRow.insertCell(2).innerHTML = price;
+            newRow.insertCell(3).innerHTML = quan;  
+            newRow.insertCell(4).innerHTML ='<button class="edbuttons" data-name="'+name+'" onclick="editData(this)">Edit</button>'+" "+ 
+            '<button class="edbuttons" data-name="'+name+'" onclick="deleteData(this)">Delete</button>';
+            form.reset();
+        }
+    }
+
+    function editData(button) { 
+        let getID = button.getAttribute('data-name');
+        let getNumID = Number(getID)
+        let ind = productID.indexOf(getNumID)
+        let row = button.parentNode.parentNode; 
+        let priceCell = row.cells[2]; 
+        let quanCell = row.cells[3];
+        
+        // Prompt the user to enter updated values 
+        let priceInput = 
+            prompt("Enter the new price:", 
+                priceCell.innerHTML 
+            ); 
+        let quanInput = 
+            prompt("Enter the updated quantity:", 
+                quanCell.innerHTML 
+            ); 
+        
+        priceCell.innerHTML = priceInput; 
+        quanCell.innerHTML = quanInput; 
+
+        price[ind] = Number(priceInput);
+        quantity[ind] = Number(quanInput);
+        localStorage.setItem("price", JSON.stringify(price));
+        localStorage.setItem("quantity", JSON.stringify(quantity));
+    } 
+
+    function deleteData(button) {
+        let getID = button.getAttribute('data-name');
+        let getNumID = Number(getID)
+        let ind = productID.indexOf(getNumID)
+        let row = button.parentNode.parentNode; 
+        row.parentNode.removeChild(row); 
+        productID.splice(ind,1);
+        productNames.splice(ind,1);
+        price.splice(ind,1);
+        quantity.splice(ind,1);
+        localStorage.setItem("productID", JSON.stringify(productID));
+        localStorage.setItem("productNames", JSON.stringify(productNames));
+        localStorage.setItem("price", JSON.stringify(price));
+        localStorage.setItem("quantity", JSON.stringify(quantity));
+    } 
+</script>

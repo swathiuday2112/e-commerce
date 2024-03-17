@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<script>
+    // User login details
+    const users = [
+        {
+            "username": "admin",
+            "firstname": "uday",
+            "password": "admin123",
+            "role": "admin"
+        },
+        {
+            "username": "user1",
+            "firstname": "swathi",
+            "password": "password123",
+            "role": "user"
+        }
+    ];
+
+    localStorage.setItem('users', JSON.stringify(users));
+
+
+    // Product Details
+    let productID = [1,2,3,4];
+    let productNames = ["Godrej Refrigerator","Samsung Oven","SONY LED TV 64 inch","Philips Iron Box"];
+    let price = [25000,19000,59999,530];
+    let quantity = [8,12,5,23];
+
+    localStorage.setItem("productID", JSON.stringify(productID));
+    localStorage.setItem("productNames", JSON.stringify(productNames));
+    localStorage.setItem("price", JSON.stringify(price));
+    localStorage.setItem("quantity", JSON.stringify(quantity));
+
+</script>
