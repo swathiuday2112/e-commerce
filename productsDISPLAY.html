@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<style>
+
+.product {
+    display: flex;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.product img {
+    width: 150px;
+    height: 150px;
+    margin-right: 20px;
+}
+
+.product-details {
+    flex-grow: 1;
+}
+
+.cartButton{
+    width: 20%;
+    cursor: pointer;
+    border-style: groove;
+    padding-right: 4%;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+
+<html>
+    <head>
+        <title>Product Display</title>
+    </head>
+    <body>
+        <div class="container">
+            <div>
+                <h1>HOME APPLIANCES</h1>
+            </div>
+            <div style="margin-right:-12%">
+                <button class="cartButton" onclick="window.open('cart.html')">
+                    <img src="cart_image.png" width="110%">
+                </button>
+            </div>
+        </div>
+        <div id="products"></div>
+    </body>
+</html>
+
+<script>
+    let products = JSON.parse(localStorage.getItem('products'));
+
+    // Function to display products
+    function displayProducts() {
+      const productsContainer = document.getElementById("products");
+
+      products.forEach(product => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "product";
+
+        // Create image element
+        const productImage = document.createElement("img");
+        productImage.src = product.image_path;
+        productImage.alt = product.productname;
+        productImage.style.width = "14%"
+
+        // Create div for product details
+        const productDetails = document.createElement("div");
+        productDetails.className = "product-details";
+
+        // Create elements for product details
+        const productName = document.createElement("h3");
+        productName.textContent = product.productname;
+
+        const productPrice = document.createElement("p");
+        productPrice.textContent = "Price: Rs." + product.price;
+
+        const addButton = document.createElement("button");
+        addButton.textContent = "Add To Cart";
+        addButton.style.cursor = "pointer";
+        addButton.addEventListener("click", function(){addButton.textContent = "Added To Cart";});
+        addButton.addEventListener("click", () => addToCart(product));
+
+        // Append image and details to productDiv
+        productDetails.appendChild(productName);
+        productDetails.appendChild(productPrice);
+        productDetails.appendChild(addButton);
+
+        productDiv.appendChild(productImage);
+        productDiv.appendChild(productDetails);
+
+        productsContainer.appendChild(productDiv);
+      });
+    }
+    displayProducts();
+
+    // Function to add product to cart
+    function addToCart(product) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      const existingProduct = cart.find(item => item.productid === product.productid);
+
+      if (existingProduct) {
+        // If product exists, increase quantity
+        existingProduct.quantity++;
+      } 
+      else {
+        cart.push({
+          productid: product.productid,
+          productname: product.productname,
+          price: product.price,
+          quantity: 1,
+          image_path: product.image_path
+        });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+</script>

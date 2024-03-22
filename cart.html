@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<style>
+.cart-item {
+  	border-bottom: 1px solid #ccc;
+  	padding: 5px 0;
+}
+.product {
+	display: flex;
+  	border-bottom: 1px solid #ccc;
+  	padding: 1%;
+  	margin-bottom: 1%;
+}
+.product img {
+  	margin-right: 2%;
+}
+.product-details {
+    flex-grow: 1;
+}
+</style>
+
+<html>
+	<head>
+  		<title>Cart</title>
+	</head>
+	<body>
+  		<h1>Cart</h1>
+  		<div id="cart"></div>
+	</body>
+</html>
+
+<script>
+	let products = JSON.parse(localStorage.getItem('cart')) || [];
+	let cartValue = 0;
+	let amt;
+	function displayCart() {
+	  	const productsContainer = document.getElementById("cart");
+
+	  	products.forEach(product => {
+		    const productDiv = document.createElement("div");
+		    productDiv.className = "product";
+
+		    // Create image element
+		    const productImage = document.createElement("img");
+		    productImage.src = product.image_path;
+		    productImage.alt = product.productname;
+		    productImage.style.width = "11%"
+
+		    // Create div for product details
+		    const productDetails = document.createElement("div");
+		    productDetails.className = "product-details";
+
+		    // Create elements for product details
+		    const productName = document.createElement("p");
+		    productName.textContent = product.productname;
+
+		    const productPrice = document.createElement("b");
+		    productPrice.textContent = "Price: Rs." + product.price;
+
+		    const productQuantity = document.createElement("p");
+		    productQuantity.textContent = "Quantity: " + product.quantity;
+
+		    amt = product.price*product.quantity;
+		    cartValue += amt;
+
+		    const minusButton = document.createElement("button");
+		    minusButton.textContent = "-";
+		    minusButton.style.cursor = "pointer";
+		    minusButton.addEventListener("click", function(){ 
+		    	if (product.quantity>1){
+		    		product.quantity-=1
+		    		productQuantity.textContent = "Quantity: " + product.quantity;
+		    	}
+		    	else{
+		    		productDiv.removeChild(productImage);
+		    		productDiv.removeChild(productDetails);
+		    		getNumID = product.productid;
+		    		let ind = products.findIndex(product => product.productid === getNumID);
+		    		products.splice(ind,1);
+		    	}
+		    	cartValue -= product.price;
+		    	localStorage.setItem('cart', JSON.stringify(products));
+		    	location.reload();
+		    });
+
+		    const plusButton = document.createElement("button");
+		    plusButton.textContent = "+";
+		    plusButton.style.cursor = "pointer";
+		    plusButton.addEventListener("click", function(){ 
+	    		product.quantity+=1
+	    		productQuantity.textContent = "Quantity: " + product.quantity;
+	    		cartValue += product.price;
+		    	localStorage.setItem('cart', JSON.stringify(products));
+		    	location.reload();
+		    });
+
+		    const deleteButton = document.createElement("button");
+		    deleteButton.textContent = "Delete";
+		    deleteButton.style.cursor = "pointer";
+		    deleteButton.addEventListener("click", function(){ 
+	    		productDiv.removeChild(productImage);
+	    		productDiv.removeChild(productDetails);
+	    		getNumID = product.productid;
+	    		let ind = products.findIndex(product => product.productid === getNumID);
+	    		products.splice(ind,1);
+	    		amt = product.price*product.quantity;
+		    	cartValue -= amt;
+		    	localStorage.setItem('cart', JSON.stringify(products));
+		    	location.reload();
+		    });
+
+
+		    // Append image and details to productDiv
+		    productDetails.appendChild(productName);
+		    productDetails.appendChild(productPrice);
+		    productDetails.appendChild(productQuantity);
+		    productDetails.appendChild(minusButton);
+		    productDetails.appendChild(plusButton);
+		    productDetails.appendChild(deleteButton);
+
+		    productDiv.appendChild(productImage);
+		    productDiv.appendChild(productDetails);
+
+		    productsContainer.appendChild(productDiv);
+		});
+
+
+	  	const cartDiv = document.createElement("div");
+	  	const cv= document.createElement("h2");
+	  	if (cartValue!=0){
+		  	cv.textContent = "Subtotal ₹"+cartValue+".00";
+		  	cv.style.color = "#c44d6d";
+	  	}
+	  	else{
+		  	cv.textContent = "Your Cart is empty.";
+		  	cv.style.color = "gray";
+	  	}
+	  	cartDiv.appendChild(cv);
+	  	productsContainer.appendChild(cartDiv);
+	}
+	displayCart();
+</script>
