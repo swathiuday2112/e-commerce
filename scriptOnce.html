@@ -21,14 +21,37 @@
 
 
     // Product Details
-    let productID = [1,2,3,4];
-    let productNames = ["Godrej Refrigerator","Samsung Oven","SONY LED TV 64 inch","Philips Iron Box"];
-    let price = [25000,19000,59999,530];
-    let quantity = [8,12,5,23];
+    const products = [
+        {
+            "productid": 1,
+            "productname": "Samsung Microwave Oven",
+            "price": 8499,
+            "quantity": 6,
+            "image_path": "images/1.jpeg"
+        },
+        {
+            "productid": 2,
+            "productname": "Whirlpool Washing Machine",
+            "price": 24279,
+            "quantity": 17,
+            "image_path": "images/2.png"
+        },
+        {
+            "productid": 3,
+            "productname": "OLED TV 64 inches",
+            "price": 157000,
+            "quantity": 3,
+            "image_path": "images/3.jpeg"
+        },
+        {
+            "productid": 4,
+            "productname": "LG Frost Free Refrigerator",
+            "price": 49590,
+            "quantity": 10,
+            "image_path": "images/4.jpeg"
+        }
+        
+    ];
 
-    localStorage.setItem("productID", JSON.stringify(productID));
-    localStorage.setItem("productNames", JSON.stringify(productNames));
-    localStorage.setItem("price", JSON.stringify(price));
-    localStorage.setItem("quantity", JSON.stringify(quantity));
-
+    localStorage.setItem('products', JSON.stringify(products));
 </script>
