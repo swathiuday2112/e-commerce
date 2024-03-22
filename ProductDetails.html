@@ -118,64 +118,61 @@
 </html>
 
 <script> 
-    let productID = JSON.parse(localStorage.getItem('productID')) || [];
-    let productNames = JSON.parse(localStorage.getItem('productNames')) || [];
-    let price = JSON.parse(localStorage.getItem('price')) || [];
-    let quantity = JSON.parse(localStorage.getItem('quantity')) || [];
+    let products = JSON.parse(localStorage.getItem('products'));
 
     let productTable = document.getElementById("productTable");
-
-    productID.map(function(elem, index) {
-        console.log(elem);
+    products.forEach(product => {
         let newRow = productTable.insertRow(productTable.rows.length); 
-        newRow.insertCell(0).innerHTML = elem; 
-        newRow.insertCell(1).innerHTML = productNames[index]; 
-        newRow.insertCell(2).innerHTML = price[index]; 
-        newRow.insertCell(3).innerHTML = quantity[index]; 
-        newRow.insertCell(4).innerHTML = '<button class="edbuttons" data-name="'+elem+'" onclick="editData(this)">Edit</button>'+" "+ 
-                                        '<button class="edbuttons" data-name="'+elem+'" onclick="deleteData(this)">Delete</button>';
-    })
+        newRow.insertCell(0).innerHTML = product.productid; 
+        newRow.insertCell(1).innerHTML = product.productname; 
+        newRow.insertCell(2).innerHTML = product.price; 
+        newRow.insertCell(3).innerHTML = product.quantity; 
+        newRow.insertCell(4).innerHTML = '<button class="edbuttons" data-name="'+product.productid+'" onclick="editData(this)">Edit</button>'+" "+ 
+                                        '<button class="edbuttons" data-name="'+product.productid+'" onclick="deleteData(this)">Delete</button>';
+    });
 
     function addProduct() { 
-        let pid = document.getElementById("pid").value; 
+        let pid = Number(document.getElementById("pid").value); 
         let pname = document.getElementById("pname").value; 
-        let pprice = document.getElementById("pprice").value; 
-        let pquan = document.getElementById("pquantity").value; 
+        let pprice = Number(document.getElementById("pprice").value); 
+        let pquan = Number(document.getElementById("pquantity").value); 
 
         const form = document.getElementById('my_form');
 
-        if(productID.includes(Number(pid))) {
+        const findIndex = products.findIndex(product => product.productid === pid);
+        if(findIndex !== -1) {
             alert("Product ID already exists.");
             form.reset();
             return false;
         }
 
         if(pid!='' && pname!='' && pprice!='' && pquan!=''){
+            const newProduct = {
+                productid: pid,
+                productname: pname,
+                price: pprice,
+                quantity: pquan
+            };
+            products.push(newProduct);
+            localStorage.setItem('products', JSON.stringify(products));
+
             let table;
             table = document.getElementById("productTable");
-            productID.push(Number(pid));
-            productNames.push(pname);
-            price.push(Number(pprice));
-            quantity.push(Number(pquan));
-            localStorage.setItem("productID", JSON.stringify(productID));
-            localStorage.setItem("productNames", JSON.stringify(productNames));
-            localStorage.setItem("price", JSON.stringify(price));
-            localStorage.setItem("quantity", JSON.stringify(quantity));
             let newRow = table.insertRow(-1); 
             newRow.insertCell(0).innerHTML = pid;
             newRow.insertCell(1).innerHTML = pname;
-            newRow.insertCell(2).innerHTML = price;
-            newRow.insertCell(3).innerHTML = quan;  
-            newRow.insertCell(4).innerHTML ='<button class="edbuttons" data-name="'+name+'" onclick="editData(this)">Edit</button>'+" "+ 
-            '<button class="edbuttons" data-name="'+name+'" onclick="deleteData(this)">Delete</button>';
+            newRow.insertCell(2).innerHTML = pprice;
+            newRow.insertCell(3).innerHTML = pquan;  
+            newRow.insertCell(4).innerHTML ='<button class="edbuttons" data-name="'+pid+'" onclick="editData(this)">Edit</button>'+" "+ 
+            '<button class="edbuttons" data-name="'+pid+'" onclick="deleteData(this)">Delete</button>';
             form.reset();
         }
     }
 
     function editData(button) { 
         let getID = button.getAttribute('data-name');
-        let getNumID = Number(getID)
-        let ind = productID.indexOf(getNumID)
+        let getNumID = Number(getID);
+        let ind = products.findIndex(product => product.productid === getNumID);
         let row = button.parentNode.parentNode; 
         let priceCell = row.cells[2]; 
         let quanCell = row.cells[3];
@@ -193,25 +190,18 @@
         priceCell.innerHTML = priceInput; 
         quanCell.innerHTML = quanInput; 
 
-        price[ind] = Number(priceInput);
-        quantity[ind] = Number(quanInput);
-        localStorage.setItem("price", JSON.stringify(price));
-        localStorage.setItem("quantity", JSON.stringify(quantity));
+        products[ind].price = Number(priceInput);
+        products[ind].quantity = Number(quanInput);
+        localStorage.setItem('products', JSON.stringify(products));
     } 
 
     function deleteData(button) {
         let getID = button.getAttribute('data-name');
-        let getNumID = Number(getID)
-        let ind = productID.indexOf(getNumID)
+        let getNumID = Number(getID);
+        let ind = products.findIndex(product => product.productid === getNumID);
         let row = button.parentNode.parentNode; 
         row.parentNode.removeChild(row); 
-        productID.splice(ind,1);
-        productNames.splice(ind,1);
-        price.splice(ind,1);
-        quantity.splice(ind,1);
-        localStorage.setItem("productID", JSON.stringify(productID));
-        localStorage.setItem("productNames", JSON.stringify(productNames));
-        localStorage.setItem("price", JSON.stringify(price));
-        localStorage.setItem("quantity", JSON.stringify(quantity));
+        products.splice(ind,1);
+        localStorage.setItem('products', JSON.stringify(products));
     } 
 </script>
