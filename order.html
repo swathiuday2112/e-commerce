@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<style>
+    body{
+        margin: 0;
+        font-family: Poppins;
+    }
+    .HA_title{
+        font-size: 280%;
+    }
+    .container{
+        width: 75%;
+        margin: auto;
+        text-align: center;
+        padding-top: 10px;
+    }
+    header{
+        display: flex;
+        padding: 20px 0px;
+    }
+    .searchClass{
+        width: 215%;
+        padding: 6%;    
+        background-color: #f0f0f5;
+        border: none;
+        border-radius: 50px;
+    }
+    .searchButton{
+        padding-bottom: 0%;
+        border-style: groove;
+        border: none;
+        background: none;
+    }
+    .search_img{
+        width: 7%;
+        cursor: pointer;
+    }
+    .threeDots{
+        color:gray;
+        background-color: white;
+        border: none;
+        cursor: pointer;
+        float: right;
+        text-decoration: underline;
+        font-size: 100%;
+    }
+    .threeDots:hover {
+        color: black;
+    }
+    .cart_img{
+        width: 300%;
+    }
+    .icon-cart{
+        position: fixed;
+        width: 2%;
+        top: 3%;
+        right: 6%;
+    }
+    .icon-cart span{
+        position: absolute;
+        background-color: red;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color: #fff;
+        top: 45%;
+        left: 118%;
+    }
+    .listProduct .item img{
+        width: 90%;
+    }
+    .listProduct{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4%;
+    }
+    .listProduct .item{
+        background-color: #EEEEE6;
+        padding: 10%;
+        border-radius: 20px;
+    }
+    .listProduct .item h2{
+        font-weight: bolder;
+        font-size: large;
+
+    }
+    .listProduct .item button{
+        background-color: #353432;
+        color: #eee;
+        border: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    .cartButton{
+        cursor: pointer;
+        border: none;
+        background: none;
+    }
+
+    /* laptop */
+    @media only screen and (max-width: 992px) {
+        .listProduct{
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .HA_title{
+            font-size: 250%;
+        }
+        .icon-cart span{
+            position: absolute;
+            background-color: red;
+            width: 17px;
+            height: 17px;
+            font-size: 70%;
+            border-radius: 50%;
+            color: #fff;
+            top: 50%;
+            left: 198%;
+        }
+        .cart_img{
+            width: 650%;
+        }
+        .threeDots{
+            font-size: 100%;
+        }
+    }
+
+
+    /* mobile */
+    @media only screen and (max-width: 768px) {
+        .listProduct{
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .HA_title{
+            font-size: 150%;
+        }
+        .search_img{
+            padding-left: 5%;
+            width: 11%;
+        }
+        .cart_img{
+            width: 5.9vw;
+        }
+        .icon-cart span{
+            position: absolute;
+            background-color: red;
+            width: 11px;
+            height: 11px;
+            font-size: 45%;
+            border-radius: 50%;
+            color: #fff;
+            top: 45%;
+            left: 198%;
+        }
+        .threeDots{
+            margin-right: -6%;
+            font-size: 50%;
+        }
+    }
+
+
+</style>
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <head>
+        <meta charset="utf-8">
+        <title>Order</title>
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/10.11.1/firebase-app-compat.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/10.11.1/firebase-auth-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-database-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-firestore-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-functions-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-messaging-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-storage-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-analytics-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-remote-config-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-performance-compat.js"></script>
+        <!-- 
+        initialize the SDK after all desired features are loaded, set useEmulator to false
+        to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    </head>
+    <body>
+        <div class="container">
+            <br>
+            <div class="HA_title">HOME APPLIANCES</div>
+            <button class="threeDots" id="logoutButton">Logout</button>
+            <div class="icon-cart">
+                <button class="cartButton" onclick="openCart()">
+                    <img src="cart_image.png" class="cart_img">
+                </button>
+                <span></span>
+            </div>
+            <br><br>
+            <header>
+                <form id="searchForm">
+                    <input placeholder="Search" class="searchClass" id="searchInput" autocomplete="off" onclick="selectAllText()">
+                </form>
+                <div>
+                    <button class="searchButton" onclick="search()">
+                        <img src="search_icon.png" class="search_img">
+                    </button>
+                </div>
+            </header>
+            <br>
+            <div class="listProduct"></div>
+            <div class="searchMsg"></div>
+        </div>
+    </body>
+</html>
+<script>
+    document.getElementById('searchInput').onkeydown = function(e){
+        if(e.keyCode == 13){
+            e.preventDefault();
+            search();
+        }
+    };
+    function selectAllText() {
+        var searchInput = document.getElementById("searchInput");
+        searchInput.select();
+    }
+
+    const logoutButton = document.getElementById('logoutButton');
+    logoutButton.addEventListener('click', function() {
+        firebase.auth().signOut().then(() => {
+            window.location.href = "index.html"; // Redirect to login page or any other page after logout
+        })
+    });
+
+
+    let listProductHTML = document.querySelector('.listProduct');
+    let searchMessage = document.querySelector('.searchMsg');
+    let listCartHTML = document.querySelector('.listCart');
+    let iconCart = document.querySelector('.icon-cart');
+    let iconCartSpan = document.querySelector('.icon-cart span');
+    let body = document.querySelector('body');
+
+    document.addEventListener("DOMContentLoaded", event =>{
+        const app = firebase.app();
+        const db = firebase.firestore();
+
+        firebase.auth().onAuthStateChanged(function(user){
+            var userId = user.uid;
+            const usersCollection = firebase.firestore().collection('users');
+            usersCollection.doc(userId).get().then(function(doc){
+                var cartData = doc.data().cart;
+                let count=0;
+                for (key in cartData){
+                    count+=cartData[key];
+                }
+                iconCartSpan.innerText = count;
+
+            })
+        })
+
+        const productsRef = db.collection('products');
+        const query = productsRef.where('quantity','>',0)
+        query.get()
+            .then(products => {
+                products.forEach(doc => {
+                    data = doc.data()
+
+                    let newProduct = document.createElement('div');
+                    newProduct.classList.add('item');
+                    if (data.productName.length > 30) {
+                        data.productName = data.productName.substring(0, 30) + '...';
+                    }
+                    newProduct.innerHTML = 
+                    `<img src="${data.image}" alt="product_image">
+                    <h2>${data.productName}</h2>
+                    <div class="price"><i>Rs.${data.price}</i></div>`;
+                    
+                    const addButton = document.createElement("button");
+                    addButton.textContent = "Add To Cart";
+                    addButton.style.cursor = "pointer";
+                    addButton.addEventListener("click", () => addToCart(doc.id));
+                    newProduct.appendChild(addButton);
+                    listProductHTML.appendChild(newProduct);
+                })
+            })
+    });
+
+
+    function search(){
+        let search_Input = document.getElementById("searchInput").value.trim()
+        let searchInput = search_Input.toLowerCase();
+        console.log(searchInput);
+        if (!searchInput){
+            window.location.reload();
+        }
+        else{
+            listProductHTML.replaceChildren();
+            searchMessage.replaceChildren();
+            const app = firebase.app();
+            const db = firebase.firestore();
+            const productsRef = db.collection('products');
+            productsRef.get()
+                .then(products => {
+                    let found = false;
+                    products.forEach(doc => {
+                        data = doc.data();
+                        var productNameInDB = data.productName.toLowerCase();
+                        if (productNameInDB.includes(searchInput)){
+                            found = true;
+                            if (data.quantity>0){
+                                let newProduct = document.createElement('div');
+                                newProduct.classList.add('item');
+                                newProduct.innerHTML = 
+                                `<img src="${data.image}" alt="product_image">
+                                <h2>${data.productName}</h2>
+                                <div class="price"><i>Rs.${data.price}</i></div>`;
+                                
+                                const addButton = document.createElement("button");
+                                addButton.textContent = "Add To Cart";
+                                addButton.style.cursor = "pointer";
+                                addButton.addEventListener("click", () => addToCart(doc.id));
+                                newProduct.appendChild(addButton);
+                                listProductHTML.appendChild(newProduct);
+                            }
+                            else{
+                                const msgDiv = document.createElement("div");
+                                const cv= document.createElement("h2");
+                                cv.textContent = "Oops! "+searchInput+" is Out of Stock. Try later.";
+                                cv.style.color = "gray";
+                                msgDiv.appendChild(cv);
+                                searchMessage.appendChild(msgDiv);
+                            }
+                        }
+                    });
+                    if (!found){
+                        const msgDiv = document.createElement("div");
+                        const cv= document.createElement("h2");
+                        cv.textContent = "No results for "+search_Input+"!";
+                        cv.style.color = "gray";
+                        msgDiv.appendChild(cv);
+                        searchMessage.appendChild(msgDiv);
+                    }
+                })
+        }
+    }
+
+    function openCart(){
+        window.location.href = "cart.html";
+    }
+
+    function addToCart(productid){
+        console.log(productid);
+        firebase.auth().onAuthStateChanged(function(user){
+            var userId = user.uid;
+            console.log("User ID:", userId);
+            const usersCollection = firebase.firestore().collection('users');
+            usersCollection.doc(userId).get().then(function(doc){
+                var cartData = doc.data().cart;
+                console.log("Cart:",cartData);
+                if (productid in cartData){
+                    cartData[productid]++;
+                    console.log(cartData);
+                    usersCollection.doc(userId).update({
+                        cart: cartData
+                    }).then(function(){
+                        window.location.href = "cart.html";
+                    })
+                }
+                else{
+                    cartData[productid]=1;
+                    usersCollection.doc(userId).update({
+                        cart: cartData
+                    }).then(function(){
+                        window.location.href = "cart.html";
+                    })
+                }
+
+            })
+            
+        });
+    }
+        
+</script>

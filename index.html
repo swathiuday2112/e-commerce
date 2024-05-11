@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Pepperfry</title>
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/10.11.1/firebase-app-compat.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/10.11.1/firebase-auth-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-database-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-firestore-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-functions-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-messaging-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-storage-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-analytics-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-remote-config-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-performance-compat.js"></script>
+        <!-- 
+        initialize the SDK after all desired features are loaded, set useEmulator to false
+        to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            }
+            .container {
+            margin: 100px auto;
+            text-align: center;
+            }
+            h1 {
+            color: #333;
+            font-size: 480%;
+            margin-bottom: 3%;
+            }
+            p {
+            color: #666;
+            font-size: 200%;
+            margin-bottom: 4%;
+            }
+            .login-btn {
+            background-color: #db4437;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+            }
+            .login-btn:hover {
+            background-color: #c1351d;
+            }
+            /* mobile */
+            @media only screen and (max-width: 600px) {
+                h1 {
+                font-size: 300%;
+                }
+                p {
+                font-size: 100%;
+                }
+                .login-btn {
+                font-size: 11px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Pepperfry</h1>
+            <p>Your One-Stop Online Home-Appliances Store. Happy Home :)</p>
+            <button class="login-btn" onclick="googleLogin()">Login with Google</button>
+        </div>
+    <script src="app.js"></script>
+    </body>
+</html>
+

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: white;
+        margin: 0;
+        padding: 20px;
+    }
+    .heading1 {
+        font-family: Arial, sans-serif;
+        color: #db4437;
+        text-align: center;
+        font-size: 260%;
+    }
+    .heading2 { 
+        text-align: center;
+        font-size: 240%;
+        color: black;
+        text-decoration-line: underline;
+    }
+    .subheadings{
+        text-align: center;
+        font-size: 140%;
+    } 
+    table,th,td {
+        padding: 5px;
+        text-align: center;
+        border-bottom: 1px solid black;
+        border-collapse: collapse;
+    }
+    table{
+        border: 2px solid black;
+        margin-left:auto;
+        margin-right:auto;
+    }
+    tr{
+        background-color: #f2f2f2;
+    }
+    tr:hover{
+        background-color: white;
+    }
+    #cleardiv {
+        clear: left;
+    }
+    .inputElem {
+        padding: 100%;
+        width: 15%;
+        font-weight: 400;
+        padding: 3px;
+        border: 3px solid;
+        border-color: silver;
+    }
+    .addButton{
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    .addButton:hover {
+        background-color: #0056b3;
+    }
+
+    .addButton:active {
+        background-color: #0056b3;
+    }
+    .edbuttons{
+        cursor: pointer;
+        color: white;
+        background-color: black;
+        border-color: gray;
+        border-radius: 2%;
+    }
+    .addfields{
+        padding-top: 20px; 
+    }
+</style>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Pepperfry Product Details</title>
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/10.11.1/firebase-app-compat.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/10.11.1/firebase-auth-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-database-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-firestore-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-functions-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-messaging-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-storage-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-analytics-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-remote-config-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-performance-compat.js"></script>
+        <!-- 
+        initialize the SDK after all desired features are loaded, set useEmulator to false
+        to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    </head>
+    <body>
+        <h2>HELLO ADMIN!</h2>
+        <div class="heading1">
+            <b>PEPPERFRY</b>
+        </div>
+        <div class="heading2">
+            <p>Product Details</p>
+        </div>
+        <div style="text-align: center;">
+            <button type="button" class="addButton" onclick="document.getElementById('menuEdit').scrollIntoView();"><b>Click to add</b></button>
+        </div>
+        <br>
+        <div>
+            <table style="width:80%" id="productTable">   
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Price(Rs.)</th> 
+                        <th>Quantity Available</th>
+                        <th>Action</th>
+                    </tr>
+                </table>
+            <br><br>
+        </div>
+        <br>
+        <div id="menuEdit">
+            <p style="font-size: 130%"><b>ADD NEW PRODUCT :</b></p>
+            <div align="left" style="padding-left: 2%;">
+                <form action="" id="my_form">
+                    <div class="addfields" style="width: 230%"><b>
+                    Product Name<sup style="color:red">*</sup>:</b> <input type="text" class="inputElem" id="pname" autocomplete="off" required>
+                    </div>  
+                    <div class="addfields" style="width: 40%"><b>
+                    Price(Rs.)<sup style="color:red">*</sup>:</b> <input type="number" class="inputElem" id="pprice" autocomplete="off" required>
+                    </div> 
+                    <div class="addfields" style="width: 19%"><b>
+                    Quantity<sup style="color:red">*</sup>:</b> <input type="number" class="inputElem" id="pquantity" min="1" max="99" autocomplete="off" required>
+                    </div>
+                    <br>
+                    <input type="file" id="myFileInput" accept="image/*" autocomplete="off">
+                    <br><br>
+                    <button type="button" class="addButton" onclick="addProduct()"> Add</button>
+                </form>
+            </div>  
+        </div> 
+    </body>
+</html>
+
+<script> 
+    document.addEventListener("DOMContentLoaded", event =>{
+        let productTable = document.getElementById("productTable");
+        const app = firebase.app();
+        const db = firebase.firestore();
+        const productsRef = db.collection('products');
+        const query = productsRef.orderBy('productName') //previously productID
+        query.get()
+            .then(products => {
+                products.forEach(doc => {
+                    data = doc.data()
+                    let newRow = productTable.insertRow(productTable.rows.length); 
+                    newRow.insertCell(0).innerHTML = doc.id; 
+                    newRow.insertCell(1).innerHTML = data.productName; 
+                    newRow.insertCell(2).innerHTML = data.price; 
+                    newRow.insertCell(3).innerHTML = data.quantity; 
+                    newRow.insertCell(4).innerHTML = '<button class="edbuttons" data-name="'+doc.id+'" onclick="editData(this)">Edit</button>'+" "+ 
+                                                    '<button class="edbuttons" data-name="'+doc.id+'" onclick="deleteData(this)">Delete</button>';
+                })
+            })
+    });
+
+
+    function addProduct() { 
+        let pname = document.getElementById("pname").value; 
+        let pprice = Number(document.getElementById("pprice").value); 
+        let pquan = Number(document.getElementById("pquantity").value); 
+        let fileinput = document.getElementById("myFileInput"); 
+        let imageFile = fileinput.files[0];
+
+        if(pname !== '' && pprice !== '' && pquan !== '' && imageFile) {
+            const storageRef = firebase.storage().ref();
+            const productsRef = firebase.firestore().collection('products');
+            const imageRef = storageRef.child('productImages/' + imageFile.name);
+            
+            imageRef.put(imageFile)
+            .then(snapshot => {
+                return snapshot.ref.getDownloadURL();
+            })
+            .then(downloadURL => {
+                // Add product to Firestore
+                return productsRef.add({
+                    productName: pname,
+                    price: pprice,
+                    quantity: pquan,
+                    image: downloadURL 
+                });
+            })
+            .then(docRef => {
+                console.log("Document added with ID: ", docRef.id);
+                
+                // Reset form
+                const form = document.getElementById('my_form');
+                form.reset();
+                
+                // Update HTML table
+                let table = document.getElementById("productTable");
+                let newRow = table.insertRow(-1); 
+                newRow.insertCell(0).innerHTML = docRef.id; // Use docRef.id as the document ID
+                newRow.insertCell(1).innerHTML = pname;
+                newRow.insertCell(2).innerHTML = pprice;
+                newRow.insertCell(3).innerHTML = pquan;  
+                newRow.insertCell(4).innerHTML = '<button class="edbuttons" data-name="'+docRef.id+'" onclick="editData(this)">Edit</button>' +
+                                                    ' <button class="edbuttons" data-name="'+docRef.id+'" onclick="deleteData(this)">Delete</button>';
+            })
+            .catch(error => {
+                console.error("Error uploading image:", error);
+                throw error;
+            });
+        } 
+        else {
+            if (pname == '' || pprice == '' || pquan == '') { 
+                alert('Please fill in all fields.');
+            }
+            else {
+                alert('Select an image.');
+            }
+        }
+    }
+
+
+
+
+    function editData(button) { 
+        let getID = button.getAttribute('data-name');
+        let row = button.parentNode.parentNode; 
+        let priceCell = row.cells[2]; 
+        let quanCell = row.cells[3];
+        
+        let priceInput = prompt("Enter the new price:", priceCell.innerHTML);
+        while (!isValidNumberInput(priceInput)) {
+            priceInput = prompt("Invalid input. Please enter the new price (numbers only):", priceCell.innerHTML);
+        }
+
+        let quanInput = prompt("Enter the updated quantity:", quanCell.innerHTML);
+        while (!isValidNumberInput(quanInput)) {
+            quanInput = prompt("Invalid input. Please enter the updated quantity (numbers only):", quanCell.innerHTML);
+        }
+
+        function isValidNumberInput(input) {
+            return !isNaN(parseFloat(input)) && isFinite(input);
+        }
+
+        priceCell.innerHTML = priceInput; 
+        quanCell.innerHTML = quanInput;
+
+        const db = firebase.firestore();
+        const productsRef = db.collection('products');
+
+        // Update document in Firestore
+        productsRef.doc(getID).update({
+            price: Number(priceInput),
+            quantity: Number(quanInput)
+        })
+        .then(() => {
+            console.log("Document successfully updated in Firestore");
+        })
+        .catch(error => {
+            console.error("Error updating document in Firestore: ", error);
+        });
+    }
+
+        
+
+    function deleteData(button) {
+        let getID = button.getAttribute('data-name');
+        console.log(getID);
+
+        // Delete from Firestore
+        const productsRef = firebase.firestore().collection('products');
+        productsRef.doc(getID).delete()
+            .then(() => {
+                console.log("Document successfully deleted from Firestore");
+            })
+            .catch(error => {
+                console.error("Error deleting document from Firestore: ", error);
+            });
+
+        // Remove from HTML table
+        let row = button.parentNode.parentNode; 
+        row.parentNode.removeChild(row); 
+    }
+
+
+
+
+</script>

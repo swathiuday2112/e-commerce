@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<style>
+    body{
+        font-family: Sans-serif;
+        font-size: 100%;
+    }
+
+    /* Media query for laptop screens */
+    @media only screen and (min-width: 768px) {
+        img {
+            width: 13%; /* Font size for laptop screens */
+        }
+        #billAmt{
+        text-align: right;
+        font-size: 100%;
+        }
+        #emptyCart{
+            text-align: center;
+            font-size: 100%;
+        }
+        .title{
+            font-size: xx-large;
+            margin: 3%;
+        }
+        .back-button {
+            float: left;
+            width: 14%;
+        }
+        .back-button img {
+            width: 20%;
+            cursor: pointer;
+        }
+    }
+
+    /* Media query for phone screens */
+    @media only screen and (max-width: 867px) {
+        img {
+            width: 36%;
+        }
+        #billAmt{
+            text-align: right;
+            font-size: 60%;
+        }
+        #emptyCart{
+            text-align: center;
+            font-size: 70%;
+        }
+        .title{
+            font-size:  150%;
+            margin: 3%;
+        }
+        .back-button {
+            float: left;
+            width: 20%;
+        }
+        .back-button img {
+            width: 20%;
+            cursor: pointer;
+        }
+    }
+    .cart-item {
+        border-bottom: 1px solid #ccc;
+        padding: 5px 0;
+    }
+    .product {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        padding: 1%;
+        margin-bottom: 1%;
+    }
+    .product img {
+        margin-right: 2%;
+    }
+    .product-details {
+        flex-grow: 1;
+    }
+    .container {
+        position: relative;
+        width: 100%;
+    }
+</style>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Cart</title>
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/10.11.1/firebase-app-compat.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/10.11.1/firebase-auth-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-database-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-firestore-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-functions-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-messaging-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-storage-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-analytics-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-remote-config-compat.js"></script>
+        <script defer src="/__/firebase/10.11.1/firebase-performance-compat.js"></script>
+        <!-- 
+        initialize the SDK after all desired features are loaded, set useEmulator to false
+        to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="title" style="font-family: poppins;">SHOPPING CART</div>
+        </div>
+        <a href="order.html" class="back-button">
+            <img src="back.png" alt="Back">
+        </a>
+        <div id="billAmt"></div>
+        <div id="cart"></div>
+        <br><br>
+        <div id="emptyCart"></div>
+    </body>
+</html>
+
+
+
+<script> 
+    document.addEventListener("DOMContentLoaded", event =>{
+        const productsContainer = document.getElementById("cart");
+        firebase.auth().onAuthStateChanged(function(user){
+            var userId = user.uid;
+            console.log("User ID:", userId);
+            const usersCollection = firebase.firestore().collection('users');
+            usersCollection.doc(userId).get().then(function(doc){
+                var cartData = doc.data().cart;
+                Object.keys(cartData).forEach(product => {
+                    const docRef = firebase.firestore().collection('products').doc(product);
+                    docRef.get().then((doc) => {
+                        const data = doc.data();
+                        const name = data.productName;
+                        const price = data.price;
+                        const image = data.image;
+                        const quantity = cartData[product];
+                        const productDiv = document.createElement("div");
+                        productDiv.style.background = "#EEEEE6";
+                        productDiv.className = "product";
+
+                        const productImage = document.createElement("img");
+                        productImage.src = image;
+                        productImage.alt = name;
+
+                        const productDetails = document.createElement("div");
+                        productDetails.className = "product-details";
+
+                        // Create elements for product details
+                        const productName = document.createElement("p");
+                        productName.textContent = name;
+
+                        const productPrice = document.createElement("b");
+                        productPrice.textContent = "Price: Rs." + price;
+
+                        const productQuantity = document.createElement("p");
+                        productQuantity.textContent = "Quantity: " + quantity;
+
+                        const minusButton = document.createElement("button");
+                        minusButton.textContent = "-";
+                        minusButton.style.cursor = "pointer";
+                        minusButton.style.backgroundColor = "#bcc2c0";
+                        minusButton.addEventListener("click", function(){ 
+                            if (cartData[product]>1){
+                                cartData[product]-=1
+                                usersCollection.doc(userId).update({
+                                    cart: cartData
+                                })
+                                .then(() => {
+                                    window.location.reload()
+                                })  
+                            }
+                            else{
+                                productsContainer.removeChild(productDiv);
+                                delete cartData[product];
+                                usersCollection.doc(userId).update({
+                                    cart: cartData
+                                })
+                                .then(() => {
+                                    window.location.reload()
+                                })
+                            }
+                        });
+
+                        const plusButton = document.createElement("button");
+                        plusButton.textContent = "+";
+                        plusButton.style.cursor = "pointer";
+                        plusButton.style.backgroundColor = "#bcc2c0";
+                        plusButton.addEventListener("click", function(){
+                            cartData[product]+=1;
+                            usersCollection.doc(userId).update({
+                                cart: cartData
+                            })
+                            .then(() => {
+                                window.location.reload()
+                            })
+                            
+                        });
+
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.style.cursor = "pointer";
+                        deleteButton.style.backgroundColor = "#bcc2c0";
+                        deleteButton.addEventListener("click", function(){ 
+                            productsContainer.removeChild(productDiv);
+                            delete cartData[product];
+                            usersCollection.doc(userId).update({
+                                cart: cartData
+                            })
+                            .then(() => {
+                                window.location.reload()
+                            })
+                        });
+                        
+                        productDetails.appendChild(productName);
+                        productDetails.appendChild(productPrice);
+                        productDetails.appendChild(productQuantity);
+                        productDetails.appendChild(minusButton);
+                        productDetails.appendChild(plusButton);
+                        productDetails.appendChild(deleteButton);
+
+                        productDiv.appendChild(productImage);
+                        productDiv.appendChild(productDetails);
+
+                        productsContainer.appendChild(productDiv);
+                    })
+                })
+                let cartValue = 0;
+                let count = 0;
+                const productsRef = firebase.firestore().collection('products');
+                const getProductsPromises = []; // Array to store all promises
+
+                for (const key in cartData) {
+                    const quan = cartData[key];
+                    count += quan;
+                    const getProductPromise = productsRef.doc(key).get().then((doc) => {
+                        const data = doc.data();
+                        cartValue += data.price * quan;
+                        console.log(cartValue);
+                    });
+                    getProductsPromises.push(getProductPromise); // Add each promise to the array
+                }
+
+                // Wait for all promises to resolve
+                Promise.all(getProductsPromises).then(() => {
+                    const cartDiv = document.createElement("div");
+                    const cv = document.createElement("h2");
+                    const billAmt = document.getElementById("billAmt");
+                    const emptyCart = document.getElementById("emptyCart");
+                    let item = "item";
+                    if (count > 1) {
+                        item = "items";
+                    }
+                    if (count != 0) {
+                        cv.textContent = "Subtotal (" + count + " " + item + "): ₹" + cartValue.toFixed(2);
+                        cv.style.color = "#c44d6d";
+                        cartDiv.appendChild(cv);
+                        billAmt.appendChild(cartDiv);
+                    } else {
+                        cv.textContent = "Your Cart is empty.";
+                        cv.style.color = "gray";
+                        cartDiv.appendChild(cv);
+                        emptyCart.appendChild(cartDiv);
+                    }
+                }).catch((error) => {
+                    console.log("Error getting products:", error);
+                });
+
+            })
+        })
+    });
+</script>
